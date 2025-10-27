@@ -22,3 +22,83 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# =========================================
+# IntelliJ IDEA
+# =========================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# =========================================
+# Maven
+# =========================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# =========================================
+# Gradle
+# =========================================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# =========================================
+# Logs
+# =========================================
+*.log
+*.log.*
+logs/
+
+# =========================================
+# Spring Boot specific
+# =========================================
+# Exclude temporary files generated at runtime
+*.pid
+*.seed
+*.pid.lock
+
+# =========================================
+# OS-specific files
+# =========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# =========================================
+# Environment / Credentials
+# =========================================
+.env
+*.env
+application-*.yml
+application-*.properties
+secret-keys.yml
+credentials.json
+
+# =========================================
+# Other
+# =========================================
+*.swp
+*.swo
+*.bak
+*.tmp
+*.class
+
+# =========================================
+# IDE Common
+# =========================================
+.vscode/
+*.code-workspace
+

@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class JwtServiceImpl implements JwtService {
     private String jwtSecretKey;
 
     private Key getSignKey() {
-        return Keys.hmacShaKeyFor(jwtSecretKey.getBytes());
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecretKey));
     }
 
     public String generateToken(String subject, Map<String, Object> claims, long expiryMillis) {

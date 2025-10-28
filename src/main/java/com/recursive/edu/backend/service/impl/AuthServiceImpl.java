@@ -67,8 +67,7 @@ public class AuthServiceImpl implements AuthService {
                             .firstName(user.getFirstName())
                             .lastName(user.getLastName())
                             .middleName(user.getMiddleName())
-                            .name(String.format(UserConstants.NAME_FORMAT,
-                                    user.getFirstName(), user.getMiddleName(), user.getLastName()))
+                            .name(StringHelper.getName(user.getFirstName(), user.getMiddleName(), user.getLastName()))
                             .mobile(user.getMobile())
                             .build())
                     .build();
@@ -96,8 +95,7 @@ public class AuthServiceImpl implements AuthService {
                             .firstName(user.getFirstName())
                             .lastName(user.getLastName())
                             .middleName(user.getMiddleName())
-                            .name(String.format(UserConstants.NAME_FORMAT,
-                                    user.getFirstName(), user.getMiddleName(), user.getLastName()))
+                            .name(StringHelper.getName(user.getFirstName(), user.getMiddleName(), user.getLastName()))
                             .mobile(user.getMobile())
                             .build())
                     .build();
@@ -126,8 +124,7 @@ public class AuthServiceImpl implements AuthService {
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
                     .middleName(user.getMiddleName())
-                    .name(String.format(UserConstants.NAME_FORMAT,
-                            user.getFirstName(), user.getMiddleName(), user.getLastName()))
+                    .name(StringHelper.getName(user.getFirstName(), user.getMiddleName(), user.getLastName()))
                     .mobile(user.getMobile())
                     .build();
         } catch (Exception exception) {

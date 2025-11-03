@@ -1,20 +1,21 @@
-# ---- Build Stage ----
-FROM eclipse-temurin:17-jdk AS build
+# Use a JDK base image
+FROM openjdk:17-jdk-slim as build
+
 WORKDIR /app
 
-# Copy Maven wrapper + pom + source
+# Copy Maven wrapper and set execute permissions
 COPY mvnw .
 COPY .mvn .mvn
-COPY pom.xml .
-RUN ./mvnw dependency:go-offline -B
+RUN chmod +x mvnw
 
-# Copy the rest of the code and build
-COPY src src
+# Copy the rest of the source code
+COPY . .
+
+# Build the app
 RUN ./mvnw clean package -DskipTests
 
-# ---- Run Stage ----
-FROM eclipse-temurin:17-jdk
+# Run the jar
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

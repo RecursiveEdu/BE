@@ -3,7 +3,6 @@
  */
 package com.recursive.edu.backend.service.impl;
 
-import com.recursive.edu.backend.constants.UserConstants;
 import com.recursive.edu.backend.controller.request.AuthRefreshRequest;
 import com.recursive.edu.backend.controller.request.LoginRequest;
 import com.recursive.edu.backend.controller.response.AuthRefreshResponse;

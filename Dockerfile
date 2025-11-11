@@ -3,21 +3,22 @@
 # =========================
 FROM eclipse-temurin:21-jdk AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy Maven/Gradle build files first for caching
-COPY pom.xml mvnw ./
+# Copy Maven wrapper & configuration first
+COPY mvnw pom.xml ./
 COPY .mvn .mvn
-# If Gradle:
-# COPY build.gradle gradlew ./
-# COPY gradle gradle
 
-# Download dependencies (cached layer)
+# Give executable permission to mvnw
+RUN chmod +x mvnw
+
+# Pre-download dependencies (cached layer)
 RUN ./mvnw dependency:go-offline -B
 
-# Copy source and build the app
+# Copy project source
 COPY src src
+
+# Build the application (skip tests for faster build)
 RUN ./mvnw clean package -DskipTests
 
 # =========================
@@ -25,18 +26,14 @@ RUN ./mvnw clean package -DskipTests
 # =========================
 FROM eclipse-temurin:21-jre AS runtime
 
-# Set working directory
 WORKDIR /app
 
-# Copy only the built jar
+# Copy the jar from builder stage
 COPY --from=builder /app/target/*.jar app.jar
 
-# Set environment variables (optional but recommended)
-ENV PORT=8080 \
-    JAVA_OPTS="-Xms512m -Xmx1024m"
-
-# Expose the same port Render will map
+# Expose Render’s expected port
+ENV PORT=8080
 EXPOSE 8080
 
-# Run the app
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+# Run with Render’s dynamic port
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]

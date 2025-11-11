@@ -3,28 +3,39 @@
  */
 package com.recursive.edu.backend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.recursive.edu.backend.model.common.ApiResult;
+import com.recursive.edu.backend.model.common.Error;
+import com.recursive.edu.backend.model.exception.MissingAuthTokenException;
 import com.recursive.edu.backend.service.JwtService;
 import com.recursive.edu.backend.service.impl.UserServiceImpl;
-import jakarta.servlet.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author PrantikGuha
  * CreatedAt: {27-10-2025}
  */
-
 @Component
-public class JwtAuthFilter extends GenericFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserServiceImpl userService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JwtAuthFilter(JwtService jwtService, UserServiceImpl userService) {
         this.jwtService = jwtService;
@@ -32,37 +43,70 @@ public class JwtAuthFilter extends GenericFilter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        try {
+            String authHeader = request.getHeader("Authorization");
 
-        HttpServletRequest httpReq = (HttpServletRequest) request;
-        String authHeader = httpReq.getHeader("Authorization");
-
-//        final String path = httpReq.getServletPath();
-//        if (path.startsWith("/auth/")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        String token = authHeader.substring(7);
-        String username = jwtService.extractUsername(token);
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService.loadUserByUsername(username);
-
-            if (jwtService.isTokenValid(token)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpReq));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                throw new MissingAuthTokenException("Missing or invalid Authorization header");
             }
-        }
 
-        chain.doFilter(request, response);
+            String token = authHeader.substring(7);
+            String username = jwtService.extractUsername(token);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userService.loadUserByUsername(username);
+
+                if (jwtService.isTokenValid(token)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+
+            // ✅ Continue the chain only if no exception
+            filterChain.doFilter(request, response);
+
+        } catch (MissingAuthTokenException ex) {
+            writeErrorResponse(response, ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch (ExpiredJwtException ex) {
+            writeErrorResponse(response, "JWT token expired", HttpStatus.UNAUTHORIZED);
+        } catch (BadCredentialsException ex) {
+            writeErrorResponse(response, "Invalid credentials", HttpStatus.UNAUTHORIZED);
+        } catch (Exception ex) {
+            // ✅ Catch *any other* unhandled exception
+            writeErrorResponse(response, "Internal authentication error: " + ex.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/login")
+                || path.startsWith("/auth/signup")
+                || path.startsWith("/auth/refresh")
+                || path.startsWith("/error");
+    }
+
+    private void writeErrorResponse(HttpServletResponse response, String message, HttpStatus status)
+            throws IOException {
+        if (response.isCommitted()) return;
+
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ApiResult result = ApiResult.newInstance()
+                .withErrors(List.of(Error.createInstance(message)))
+                .withStatus(String.valueOf(status.value()))
+                .build();
+
+        response.getWriter().write(objectMapper.writeValueAsString(result));
     }
 }

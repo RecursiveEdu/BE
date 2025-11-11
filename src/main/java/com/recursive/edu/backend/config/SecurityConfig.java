@@ -4,7 +4,6 @@
 package com.recursive.edu.backend.config;
 
 import com.recursive.edu.backend.service.impl.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +48,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 // Allow public endpoints
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/error").permitAll()
+                        .requestMatchers("/auth/login", "/auth/signup", "/error", "/auth/refresh").permitAll()
                         .anyRequest().authenticated()
                 )
                 // Stateless JWT auth

@@ -1,23 +1,21 @@
 /**
  * Copyright (c) 2025 Recursive Education. All rights reserved.
  */
-package com.recursive.edu.backend.model.user;
+package com.recursive.edu.backend.controller.request;
 
-import lombok.*;
+import lombok.Data;
 
 /**
  * @author PrantikGuha
- * CreatedAt: {27-10-2025}
+ * CreatedAt: {06-11-2025}
  */
 @Data
-@Builder
-public class UserDetails {
+public class UserSignupRequest {
     private String firstName;
     private String middleName;
     private String lastName;
     private String email;
     private String mobile;
+    private String password;
     private String countryCode;
-    private String name;
-    private Boolean emailVerified;
 }

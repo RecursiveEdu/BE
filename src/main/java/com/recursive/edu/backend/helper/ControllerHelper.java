@@ -50,7 +50,7 @@ public class ControllerHelper {
 
     private <T> ResponseEntity<?> constructFieldErrorResponse(BindingResult bindingResult) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResult.newInstance()
-                .withFiledErrors(errorCollector.getAllErrors(bindingResult)).withStatus("404").build());
+                .withFiledErrors(errorCollector.getAllErrors(bindingResult)).withStatus("400").build());
     }
 
     private <T> ResponseEntity <?> constructSuccessResponse(T payload) {

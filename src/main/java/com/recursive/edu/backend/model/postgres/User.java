@@ -63,4 +63,8 @@ public class User {
 
     @Column(name = "deleted_dtm")
     private Date deletedAt;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
 }

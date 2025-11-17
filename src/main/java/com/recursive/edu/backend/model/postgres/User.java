@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2025 Recursive Education. All rights reserved.
+ */
 package com.recursive.edu.backend.model.postgres;
 
 import jakarta.persistence.*;
@@ -9,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author PrantikGuha
@@ -25,6 +29,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true)
+    private String publicId = UUID.randomUUID().toString();
 
     @Column(name = "email")
     private String email;

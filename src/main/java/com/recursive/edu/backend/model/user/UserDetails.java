@@ -3,6 +3,7 @@
  */
 package com.recursive.edu.backend.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 /**
@@ -12,6 +13,9 @@ import lombok.*;
 @Data
 @Builder
 public class UserDetails {
+    @JsonIgnore
+    private Long id;
+    private String uuid;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -20,4 +24,5 @@ public class UserDetails {
     private String countryCode;
     private String name;
     private Boolean emailVerified;
+    private String role;
 }

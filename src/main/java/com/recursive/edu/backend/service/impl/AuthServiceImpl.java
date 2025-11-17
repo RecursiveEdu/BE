@@ -72,7 +72,8 @@ public class AuthServiceImpl implements AuthService {
             String username = jwtService.extractUsername(authRefreshRequest.getRefreshToken());
             User user = userRepository.findByEmail(username).orElseThrow(() -> new ApplicationException("User not found"));
             String newAccessToken = jwtService.generateToken(user.getEmail(),
-                    Map.of("role", user.getRole()), accessTokenExpInMillis);
+                    Map.of("role", user.getRole(), "uuid", user.getPublicId(), "id", user.getId()),
+                    accessTokenExpInMillis);
             return AuthRefreshResponse.builder()
                     .accessToken(newAccessToken)
                     .user(UserDetails.builder()
@@ -84,6 +85,8 @@ public class AuthServiceImpl implements AuthService {
                             .name(StringHelper.getName(user.getFirstName(), user.getMiddleName(), user.getLastName()))
                             .mobile(user.getMobile())
                             .emailVerified(user.getEmailVerified())
+                            .uuid(user.getPublicId().toString())
+                            .role(user.getRole())
                             .build())
                     .build();
         } catch (Exception exception) {
@@ -114,6 +117,8 @@ public class AuthServiceImpl implements AuthService {
                     .name(StringHelper.getName(user.getFirstName(), user.getMiddleName(), user.getLastName()))
                     .mobile(user.getMobile())
                     .emailVerified(user.getEmailVerified())
+                    .uuid(user.getPublicId().toString())
+                    .role(user.getRole())
                     .build();
         } catch (Exception exception) {
             log.error("Exception in AuthServiceImpl.getCurrentUser, ", exception);
@@ -227,7 +232,8 @@ public class AuthServiceImpl implements AuthService {
     private LoginResponse getLoginResponse(User user) {
         try {
             String accessToken = jwtService.generateToken(user.getEmail(),
-                    Map.of("role", user.getRole()), accessTokenExpInMillis);
+                    Map.of("role", user.getRole(), "uuid", user.getPublicId(), "id", user.getId()),
+                    accessTokenExpInMillis);
             String refreshToken = jwtService.generateToken(user.getEmail(),
                     Map.of("type", "refresh"), refreshTokenExpInMillis);
             return LoginResponse.builder()
@@ -242,6 +248,8 @@ public class AuthServiceImpl implements AuthService {
                             .name(StringHelper.getName(user.getFirstName(), user.getMiddleName(), user.getLastName()))
                             .mobile(user.getMobile())
                             .emailVerified(user.getEmailVerified())
+                            .uuid(user.getPublicId().toString())
+                            .role(user.getRole())
                             .build())
                     .build();
         } catch (Exception exception) {

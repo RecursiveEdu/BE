@@ -3,6 +3,7 @@
  */
 package com.recursive.edu.backend.service.impl;
 
+import com.recursive.edu.backend.model.user.UserDetails;
 import com.recursive.edu.backend.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -62,5 +63,20 @@ public class JwtServiceImpl implements JwtService {
         } catch (JwtException e) {
             return false;
         }
+    }
+
+    @Override
+    public UserDetails extractUserDetails(String token) {
+        final Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return UserDetails.builder()
+                .email(claims.getSubject())
+                .id(claims.get("id", Long.class))
+                .uuid(claims.get("uuid", String.class))
+                .build();
+
     }
 }

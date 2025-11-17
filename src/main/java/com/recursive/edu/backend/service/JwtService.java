@@ -3,6 +3,7 @@
  */
 package com.recursive.edu.backend.service;
 
+import com.recursive.edu.backend.model.user.UserDetails;
 import io.jsonwebtoken.Claims;
 
 import java.util.Map;
@@ -17,4 +18,5 @@ public interface JwtService {
     <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
     String extractUsername(String token);
     boolean isTokenValid(String token);
+    UserDetails extractUserDetails(String token);
 }

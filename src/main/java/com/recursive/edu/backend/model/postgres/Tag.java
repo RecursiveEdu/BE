@@ -4,6 +4,10 @@
 package com.recursive.edu.backend.model.postgres;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +18,10 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "tag")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
